@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANM Group</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0D1B2A;
+      --navy-mid: #112236;
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --cream: #F5F0E8;
+      --cream-dim: #B8AFA0;
+      --white: #FAFAF8;
+      --border: rgba(201,168,76,0.2);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* Layout */
+    .page { position: relative; z-index: 1; }
+
+    /* Gold left bar */
+    .gold-bar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, transparent 0%, var(--gold) 20%, var(--gold-light) 50%, var(--gold) 80%, transparent 100%);
+      z-index: 100;
+    }
+
+    /* Header */
+    header {
+      padding: 3rem 6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown 1s ease both;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--gold); }
+
+    nav a {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+      text-decoration: none;
+      margin-left: 2.5rem;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: var(--gold); }
+
+    /* Hero */
+    .hero {
+      padding: 8rem 6rem 6rem;
+      max-width: 900px;
+      animation: fadeUp 1.2s ease 0.2s both;
+    }
+
+    .hero-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .hero-label::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--cream);
+      margin-bottom: 2rem;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .hero p {
+      font-size: 0.85rem;
+      line-height: 1.9;
+      color: var(--cream-dim);
+      max-width: 560px;
+      margin-bottom: 3rem;
+    }
+
+    /* Thesis pillars */
+    .pillars {
+      padding: 5rem 6rem;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 1.2s ease 0.4s both;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 3rem;
+    }
+
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2px;
+    }
+
+    .pillar {
+      padding: 2.5rem 2rem;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.4s, background 0.4s;
+      cursor: default;
+    }
+
+    .pillar::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+      transform-origin: left;
+    }
+
+    .pillar:hover { background: rgba(201,168,76,0.04); border-color: rgba(201,168,76,0.4); }
+    .pillar:hover::after { transform: scaleX(1); }
+
+    .pillar-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      font-weight: 300;
+      color: rgba(201,168,76,0.15);
+      line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+
+    .pillar h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 0.75rem;
+    }
+
+    .pillar p {
+      font-size: 0.75rem;
+      line-height: 1.8;
+      color: var(--cream-dim);
+    }
+
+    /* Approach */
+    .approach {
+      padding: 5rem 6rem;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      animation: fadeUp 1.2s ease 0.5s both;
+    }
+
+    .approach h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+
+    .approach h2 em { color: var(--gold-light); font-style: italic; }
+
+    .approach p {
+      font-size: 0.8rem;
+      line-height: 1.9;
+      color: var(--cream-dim);
+      margin-bottom: 1rem;
+    }
+
+    .geo-list {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .geo-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: var(--cream-dim);
+      letter-spacing: 0.05em;
+    }
+
+    .geo-item::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* Contact */
+    .contact {
+      padding: 5rem 6rem;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 6rem;
+      animation: fadeUp 1.2s ease 0.6s both;
+    }
+
+    .contact-intro h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-intro h2 em { color: var(--gold-light); font-style: italic; }
+
+    .contact-intro p {
+      font-size: 0.8rem;
+      line-height: 1.9;
+      color: var(--cream-dim);
+    }
+
+    /* Form */
+    form { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+    label {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    input, textarea, select {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 300;
+      padding: 0.85rem 1rem;
+      outline: none;
+      transition: border-color 0.3s, background 0.3s;
+      border-radius: 0;
+      width: 100%;
+      appearance: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.04);
+    }
+
+    input::placeholder, textarea::placeholder { color: rgba(245,240,232,0.25); }
+
+    textarea { resize: vertical; min-height: 120px; }
+
+    select option { background: var(--navy); color: var(--cream); }
+
+    .btn-submit {
+      margin-top: 0.5rem;
+      padding: 1rem 2.5rem;
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+      align-self: flex-start;
+    }
+
+    .btn-submit:hover {
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    .form-success {
+      display: none;
+      padding: 1.5rem;
+      border: 1px solid var(--gold);
+      font-size: 0.8rem;
+      color: var(--gold);
+      line-height: 1.8;
+    }
+
+    /* Footer */
+    footer {
+      padding: 2.5rem 6rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer p {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--cream-dim);
+    }
+
+    .footer-geo {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    /* Animations */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      header, .hero, .pillars, .approach, .contact, footer {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+      .approach, .contact { grid-template-columns: 1fr; gap: 3rem; }
+      .hero { padding-top: 5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gold-bar"></div>
+  <div class="page">
+
+    <!-- Header -->
+    <header>
+      <a href="#" class="logo">ANM<span> Group</span></a>
+      <nav>
+        <a href="#thesis">Thesis</a>
+        <a href="#approach">Approach</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <p class="hero-label">European Investment Group</p>
+      <h1>Investing in <em>critical</em><br>European technologies</h1>
+      <p>ANM Group identifies and backs exceptional companies building the infrastructure of European sovereignty — across green transition, artificial intelligence, defence, and digital independence.</p>
+    </section>
+
+    <!-- Thesis -->
+    <section class="pillars" id="thesis">
+      <p class="section-label">Investment Thesis</p>
+      <div class="pillars-grid">
+        <div class="pillar">
+          <div class="pillar-num">01</div>
+          <h3>Green</h3>
+          <p>Technologies enabling Europe's energy transition, resilience, and environmental sovereignty.</p>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">02</div>
+          <h3>Artificial Intelligence</h3>
+          <p>Sovereign AI platforms, decision-support systems, and data intelligence for critical sectors.</p>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">03</div>
+          <h3>Defence</h3>
+          <p>C4I, autonomous systems, cybersecurity, and dual-use technologies for European armed forces.</p>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">04</div>
+          <h3>Sovereign Tech</h3>
+          <p>Digital infrastructure, secure communications, and platforms reducing Europe's technological dependencies.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Approach -->
+    <section class="approach" id="approach">
+      <div>
+        <h2>A focused<br><em>consolidation</em><br>approach</h2>
+        <p>ANM Group targets established SMEs with proven products, existing customers, and strong technical teams — not early-stage bets.</p>
+        <p>We bring capital, EU funding expertise (EDF, EDIP, Horizon), and operational experience building technology teams across Europe.</p>
+      </div>
+      <div>
+        <p class="section-label">Geographic Focus</p>
+        <div class="geo-list">
+          <div class="geo-item">Belgium</div>
+          <div class="geo-item">Romania</div>
+          <div class="geo-item">Estonia · Latvia · Lithuania</div>
+          <div class="geo-item">Poland · Czech Republic</div>
+          <div class="geo-item">France · Germany</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact" id="contact">
+      <div class="contact-intro">
+        <h2>Start a<br><em>conversation</em></h2>
+        <p>We are always open to meeting founders, co-investors, and ecosystem partners aligned with our thesis.</p>
+        <p style="margin-top:1rem;">All enquiries are treated with strict confidentiality.</p>
+      </div>
+      <div>
+        <form id="contact-form" action="https://formspree.io/f/mojzeyrb" method="POST">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" required />
+          </div>
+          <div class="form-group">
+            <label for="organisation">Organisation</label>
+            <input type="text" id="organisation" name="organisation" placeholder="Company or fund" />
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <select id="subject" name="subject">
+              <option value="">Select a topic</option>
+              <option value="Investment opportunity">Investment opportunity</option>
+              <option value="Co-investment">Co-investment</option>
+              <option value="Partnership">Partnership</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Brief description of your enquiry" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="email">Your email</label>
+            <input type="email" id="email" name="email" placeholder="email@company.com" required />
+          </div>
+          <button type="submit" class="btn-submit">Send Message</button>
+        </form>
+        <div class="form-success" id="form-success">
+          Thank you. We have received your message and will be in touch shortly.
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2026 ANM Group. All rights reserved.</p>
+      <p class="footer-geo">Brussels · Bucharest · Paris</p>
+    </footer>
+
+  </div>
+
+  <script>
+    const form = document.getElementById('contact-form');
+    const success = document.getElementById('form-success');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = new FormData(form);
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
